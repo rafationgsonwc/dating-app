@@ -9,3 +9,9 @@ export const guid = () => {
       return v.toString(16);
     });
 };
+
+export const calculateAge = (birthdate: string) => {
+    const today = new Date();
+    const birthDate = new Date(birthdate);
+    return today.getFullYear() - birthDate.getFullYear();
+}

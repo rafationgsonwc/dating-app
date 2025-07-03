@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import AuthGuard from "../../lib/components/AuthGuard";
 import { useAppContext } from "@/lib/context/useAppContext";
 import Swal from "sweetalert2";
+import { calculateAge } from "../../lib/utils/utils";
 
 export default function Profile() {
     const [user, setUser] = useState<any>({});
@@ -168,9 +169,17 @@ export default function Profile() {
                     <input 
                     type="date" 
                     className="form-control"
+                    max={new Date().toISOString().split("T")[0]}
                     style={{ maxWidth: "200px" }}
                     value={formData.birthdate} 
-                    onChange={(e) => setFormData({ ...formData, birthdate: e.target.value })} 
+                    onChange={(e) => {
+                        const age = calculateAge(e.target.value);
+                        if (age < 18) {
+                            alert("You must be at least 18 years old");
+                            return;
+                        }
+                        setFormData({ ...formData, birthdate: e.target.value })
+                    }} 
                     />) : (<p>{user.birthdate?.seconds ? new Date(user.birthdate.seconds * 1000).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : "N/A"}</p>)}
                 <h6>About me</h6>
                 {isEditing ? (<textarea value={formData.aboutMe} className="form-control" onChange={(e) => setFormData({ ...formData, aboutMe: e.target.value })} />) : (<p>{user.aboutMe}</p>)}

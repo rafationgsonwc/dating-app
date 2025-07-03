@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { signInWithGoogle, signInWithMobileNumber } from "../firebase/client";
-import { validatePhoneNumber } from "../utils/utils";
+import { calculateAge, validatePhoneNumber } from "../utils/utils";
 import OTPForm from "./OTPForm";
 
 export default function CreateAccount(props: any) {
@@ -163,7 +163,15 @@ export default function CreateAccount(props: any) {
                             {/* Birthdate */}
                             <div className="form-group">
                                 <label htmlFor="birthdate">Birthdate</label>
-                                <input type="date" className="form-control" id="birthdate" value={birthdate} onChange={(e) => setBirthdate(e.target.value)} />
+                                <input type="date" className="form-control" id="birthdate" value={birthdate} max={new Date().toISOString().split("T")[0]} onChange={(e) => {
+                                    // Validate if 18 years old
+                                    const age = calculateAge(e.target.value);
+                                    if (age < 18) {
+                                        alert("You must be at least 18 years old");
+                                        return;
+                                    }
+                                    setBirthdate(e.target.value);
+                                }} />
                             </div>
                             <div className="form-group">
                                 <label htmlFor="about-me">About me</label>
