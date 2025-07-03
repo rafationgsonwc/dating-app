@@ -8,7 +8,7 @@ import OTPForm from "./OTPForm";
 export default function CreateAccount(props: any) {
     const [profilePicture, setProfilePicture] = useState<File | null>(null);
     const [previewProfilePicture, setPreviewProfilePicture] = useState<string | null>(null);
-    const [birthdate, setBirthdate] = useState("");
+    const [birthdate, setBirthdate] = useState(new Date().toISOString().split("T")[0]);
     const [name, setName] = useState("");
     const [phone, setPhone] = useState("");
     const [displayMobileNumber, setDisplayMobileNumber] = useState(false);
@@ -19,7 +19,7 @@ export default function CreateAccount(props: any) {
     const confirmation = useRef<any>(null);
     const [userCredentials, setUserCredentials] = useState<any>(null);
     const [loading, setLoading] = useState(false);
-    const [gender, setGender] = useState("");
+    const [gender, setGender] = useState("male");
     const [showMe, setShowMe] = useState("everyone");
 
     useEffect(() => {
