@@ -34,7 +34,7 @@ export default function Home() {
       <div className="panel left">
         <div className="panel-content">
             <div className="banner-text">
-            <h1><i className="la la-hand-holding-heart"></i> Kama</h1>
+            <h1><i className="la la-hand-holding-heart"></i> Lucent</h1>
             <span>A dating app for the modern world</span>
             </div>
 

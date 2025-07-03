@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     const showMe = formData.get("showMe");
     try {
         if (admin.apps.length === 0) {
-            const serviceAccount = process.env.NEXT_PUBLIC_FIREBASE_SERVICE_ACCOUNT;
+            const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
             let parseServivceAccount = JSON.parse(serviceAccount as string);
             admin.initializeApp({
               credential: admin.credential.cert(parseServivceAccount),
@@ -70,9 +70,9 @@ export async function POST(req: Request) {
 const uploadImage = async (imageFile: File) => {
     const cloudinary = require('cloudinary').v2;
     cloudinary.config({
-        cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_NAME,
-        api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
-        api_secret: process.env.NEXT_PUBLIC_CLOUDINARY_SECRET,
+        cloud_name: process.env.CLOUDINARY_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_SECRET,
     });
 
     const options = {
