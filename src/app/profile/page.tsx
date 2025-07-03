@@ -148,12 +148,12 @@ export default function Profile() {
                 )}
                 <img id="profile-preview" src={formData.previewProfilePicture || user.profilePicture || null} alt={user.name} className="profile-header-image" />
                 {isEditing && <div>
-                    <input type="file" className="form-control" accept="image/png, image/jpeg, image/jpg" onChange={(e) => {
+                    <input type="file" className="form-control" accept="image/*" onChange={(e) => {
                         const file = e.target.files?.[0];
                         if (file) {
-                            // Allow only 2mb max
-                            if (file.size > 2 * 1024 * 1024) {
-                                alert("File size must be less than 2MB");
+                            // Allow only 5mb max
+                            if (file.size > 5 * 1024 * 1024) {
+                                alert("File size must be less than 5MB");
                                 return;
                             }
                             setFormData({ ...formData, profilePictureFile: file, previewProfilePicture: URL.createObjectURL(file) });

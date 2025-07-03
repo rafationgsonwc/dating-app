@@ -353,6 +353,14 @@
             color: #172b4d;
             margin: 0 2px;
           }
+
+          @media (max-width: 480px) {
+            input {
+              width: 45px;
+              height: 60px;
+              font-size: 28px;
+            }
+          }
         
           .splitter {
             padding: 0 5px;

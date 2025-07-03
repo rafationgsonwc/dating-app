@@ -99,7 +99,7 @@ export default function CreateAccount(props: any) {
                const response = await fetch(`/api/get-user?userId=${result.user.uid}`, {
                    method: "GET",
                })
-               if (response.status === 404) {
+               if (!response.ok) {
                    setDisplayCreateAccount(true);
                    return;
                }
@@ -128,12 +128,12 @@ export default function CreateAccount(props: any) {
                                     />
                             }
                                 <label htmlFor="profile-picture">Profile picture</label>
-                                <input type="file" className="form-control" id="profile-picture" accept="image/png, image/jpeg, image/jpg" onChange={(e) => {
+                                <input type="file" className="form-control" id="profile-picture" accept="image/*" onChange={(e) => {
                                     const file = e.target.files?.[0];
                                     if (file) {
-                                        // Allow only 2mb max
-                                        if (file.size > 2 * 1024 * 1024) {
-                                            alert("File size must be less than 2MB");
+                                        // Allow only 5mb max
+                                        if (file.size > 5 * 1024 * 1024) {
+                                            alert("File size must be less than 5MB");
                                             return;
                                         }
                                         setProfilePicture(file);
