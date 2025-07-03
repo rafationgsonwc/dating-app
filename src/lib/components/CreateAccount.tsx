@@ -78,6 +78,10 @@ export default function CreateAccount(props: any) {
                     confirmation.current = confirm;
                     setDisplayMobileNumber(false);
                     setDisplayOTP(true);
+                }).catch((error) => {
+                    setLoading(false);
+                    console.error(error);
+                    alert("Failed to sign in with phone number.");
                 });
             }} disabled={!validatePhoneNumber(phone) || loading}>{loading ? "Sending OTP..." : "Next"}</button>
         </form>
@@ -105,6 +109,7 @@ export default function CreateAccount(props: any) {
            }).catch((error: any) => {
                console.error(error);
                setLoading(false);
+               alert("Failed to verify OTP");
            });
         }} />}
         {

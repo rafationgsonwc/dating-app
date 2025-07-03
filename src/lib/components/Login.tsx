@@ -20,6 +20,7 @@ export default function Login(props: any) {
         }).catch((error: any) => {
             console.error(error);
             setLoading(false);
+            alert("Failed to sign in with phone number.");
         });
     }
 
@@ -84,6 +85,7 @@ export default function Login(props: any) {
                }).catch((error: any) => {
                    console.error(error);
                    setLoading(false);
+                   alert("Failed to verify OTP.");
                });
             }} />}
         <div id="recaptcha-container" style={{ display: "none" }}></div>
