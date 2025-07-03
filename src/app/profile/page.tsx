@@ -6,7 +6,7 @@ import AuthGuard from "../../lib/components/AuthGuard";
 import { useAppContext } from "@/lib/context/useAppContext";
 import Swal from "sweetalert2";
 
-export default function Matches() {
+export default function Profile() {
     const [user, setUser] = useState<any>({});
     const [loading, setLoading] = useState(false);
     const { user: authUser } = useAppContext();
@@ -15,9 +15,9 @@ export default function Matches() {
         name: "",
         aboutMe: "",
         profilePictureFile: null,
+        previewProfilePicture: null,
         birthdate: "",
         gender: "",
-        showMe: "",
     });
     const [showDropdown, setShowDropdown] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
@@ -28,7 +28,6 @@ export default function Matches() {
     }
 
     const onSubmit = async () => {
-        console.log(formData);
         setIsEditing(false);
 
         const formDataToSend = new FormData();
@@ -56,7 +55,6 @@ export default function Matches() {
                  // Refresh the page
                 window.location.reload();
             });
-            setIsEditing(false);
         } catch (error) {
             console.error(error);
             setIsEditing(false);
@@ -81,7 +79,6 @@ export default function Matches() {
             aboutMe: userData.aboutMe,
             birthdate: userData.birthdate?.seconds ? new Date(userData.birthdate.seconds * 1000).toISOString().split("T")[0] : "",
             gender: userData.gender,
-            showMe: userData.showMe,
         })
         setLoading(false);
        }
@@ -138,7 +135,7 @@ export default function Matches() {
                                 birthdate: user.birthdate?.seconds ? new Date(user.birthdate.seconds * 1000).toISOString().split("T")[0] : "",
                                 profilePictureFile: null,
                                 gender: user.gender,
-                                showMe: user.showMe,
+                                previewProfilePicture: null,
                             })
                         }}>
                             <i className="la la-times" style={{ fontSize: "20px", color: "#5e72e4" }}></i>
@@ -149,7 +146,7 @@ export default function Matches() {
                         </button>
                    </div>
                 )}
-                <img id="profile-preview" src={user.profilePicture || null} alt={user.name} className="profile-header-image" />
+                <img id="profile-preview" src={formData.previewProfilePicture || user.profilePicture || null} alt={user.name} className="profile-header-image" />
                 {isEditing && <div>
                     <input type="file" className="form-control" accept="image/png, image/jpeg, image/jpg" onChange={(e) => {
                         const file = e.target.files?.[0];
@@ -159,11 +156,7 @@ export default function Matches() {
                                 alert("File size must be less than 2MB");
                                 return;
                             }
-                            setFormData({ ...formData, profilePictureFile: file });
-                            const profilePreview = document.getElementById('profile-preview');
-                            if (profilePreview) {
-                                (profilePreview as HTMLImageElement).src = URL.createObjectURL(file);
-                            }
+                            setFormData({ ...formData, profilePictureFile: file, previewProfilePicture: URL.createObjectURL(file) });
                         }
                     }} />
                 </div>}
@@ -199,9 +192,37 @@ function ProfileSettings({user, setShowSettings}: {user: any, setShowSettings: (
     const [showMe, setShowMe] = useState("everyone");
 
     useEffect(() => {
-        // setAgeRange([user.ageRange[0], user.ageRange[1]]);
-        // setShowMe(user.showMe);
+        setShowMe(user.showMe);
     }, [user]);
+
+    const onSubmit = async () => {
+        setShowSettings(false);
+
+        try {
+            Swal.showLoading();
+            const response = await fetch("/api/update-settings", {
+                method: "POST",
+                body: JSON.stringify({ showMe, userId: user.id }),
+            });
+            Swal.close();
+            if (!response.ok) {
+                throw new Error("Failed to update settings");
+            }
+            Swal.fire({
+                title: "Success",
+                text: "Settings updated successfully",
+                icon: "success",
+            }).then(() => {
+                window.location.reload();
+            });
+        } catch (error) {
+            console.error(error);
+            Swal.fire({
+                title: "Error",
+                text: "Failed to update settings",
+            })
+        }
+    }
 
     return (
         <div className="modal-profile-settings">
@@ -226,7 +247,7 @@ function ProfileSettings({user, setShowSettings}: {user: any, setShowSettings: (
                     <div className="form-group">
                     </div>
                 </div> */}
-                <button className="btn btn-primary" onClick={() => setShowSettings(false)}>
+                <button className="btn btn-primary" onClick={onSubmit}>
                     Save Changes
                 </button>
             </div>

@@ -11,7 +11,6 @@ export async function POST(req: NextRequest) {
     const birthdate = formData.get("birthdate") as string;
     const userId = formData.get("userId");
     const gender = formData.get("gender");
-    const showMe = formData.get("showMe");
 
     if (!userId) {
         return NextResponse.json({ error: "User ID is required" }, { status: 400 });
@@ -26,7 +25,6 @@ export async function POST(req: NextRequest) {
           birthdate: Timestamp.fromDate(new Date(birthdate)),
           updatedAt: serverTimestamp(),
           gender,
-          showMe,
         };
         let profilePictureUrl = null;
         if (profilePicture && profilePicture?.size > 0) {
