@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import AuthGuard from "../../lib/components/AuthGuard";
 import { useAppContext } from "@/lib/context/useAppContext";
-import { arrayUnion, collection, doc, documentId, getDocs, getFirestore, onSnapshot, query, addDoc, Timestamp, updateDoc, where, getDoc, and } from "firebase/firestore";
+import { arrayUnion, collection, doc, documentId, getDocs, getFirestore, onSnapshot, query, addDoc, Timestamp, updateDoc, where, getDoc } from "firebase/firestore";
 import { getFirebaseApp } from "../../lib/firebase/client";
 import { guid } from "../../lib/utils/utils";
 import { useSearchParams } from "next/navigation";
@@ -19,7 +19,6 @@ export interface UserChat {
 
 function useWindowSize() {
     const [windowSize, setWindowSize] = useState<any>({});
-    const { user: authUser } = useAppContext();
   
     useEffect(() => {
       function handleResize() {
@@ -136,7 +135,6 @@ export default function Chat() {
     }, [authUser]);
 
     const handleSelectChat = (chat: any) => {
-        console.log(chat);
         setSelectedChatId(chat.id);
     }
 
@@ -191,7 +189,7 @@ function ChatSidebarItem({chat, authUser, handleSelectChat}: {chat: UserChat, au
         if (chatUserId) {
             setChatUser(chat.members[chatUserId]);
         }
-    }, [chat]);
+    }, [chat, authUser?.id]);
 
     return (
         <div className="chat-sidebar-item" key={chat.id} onClick={() => handleSelectChat(chat)}>
@@ -255,7 +253,7 @@ function ChatWindow({selectedChatId, authUser, handleBack}: {selectedChatId: str
         }
 
         fetchChat();
-    }, [selectedChatId]);
+    }, [selectedChatId, authUser?.id]);
 
     return (
         <div className="chat-window">

@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     try {
         if (admin.apps.length === 0) {
             const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
-            let parseServivceAccount = JSON.parse(serviceAccount as string);
+            const parseServivceAccount = JSON.parse(serviceAccount as string);
             admin.initializeApp({
               credential: admin.credential.cert(parseServivceAccount),
             });

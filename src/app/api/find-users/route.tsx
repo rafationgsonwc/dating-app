@@ -1,4 +1,4 @@
-import { getFirestore, collection, query, where, getDocs, limit, documentId, orderBy, startAfter, QueryConstraint, doc, getDoc} from "firebase/firestore";
+import { getFirestore, collection, query, where, getDocs, limit, documentId, startAfter, QueryConstraint, doc, getDoc} from "firebase/firestore";
 import { getFirebaseApp } from "../../../lib/firebase/client";
 
 export async function GET(req: Request) {
