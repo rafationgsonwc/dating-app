@@ -12,11 +12,12 @@ export default function Dashboard() {
     const [swipeDirection, setSwipeDirection] = useState<null | "left" | "right">(null);
     const [loading, setLoading] = useState(false);
     const { user: authUser } = useAppContext();
+    const [isFetchingMore, setIsFetchingMore] = useState(false);
     const handlePagination = () => {
         if (currentIndex <= users.length - 1) {
             setCurrentIndex(currentIndex + 1);
         }
-        if (currentIndex === Math.floor(users.length / 2) && lastVisibleId !== "") {
+        if (currentIndex >= Math.floor(users.length / 2) && lastVisibleId !== "") {
             fetchMoreUsers();
         }
     }
@@ -71,15 +72,19 @@ export default function Dashboard() {
 
 
     const fetchMoreUsers = async () => {
+        if (isFetchingMore) return;
+        setIsFetchingMore(true);
         try {
             const response = await fetch(`/api/find-users?userId=${authUser.id}&lastVisibleId=${lastVisibleId}`);
             const usersData = await response.json();
-            setUsers([...users, ...usersData.users]);
+            setUsers(prevUsers => [...prevUsers, ...usersData.users]);
             if (usersData.lastVisible) {
                 setLastVisibleId(usersData.lastVisible);
             }
         } catch (error) {
             console.error("Error fetching more users:", error);
+        } finally {
+            setIsFetchingMore(false);
         }
     }
 
