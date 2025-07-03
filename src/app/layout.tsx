@@ -2,6 +2,7 @@
 "use client"
 import { AppContextProvider } from '@/lib/context/useAppContext';
 import '../lib/styles/globals.scss'
+import { Suspense } from 'react'
 
 export default function RootLayout({
   children,
@@ -30,7 +31,9 @@ export default function RootLayout({
   </head>
 
   <body>
-    <AppContextProvider>{children}</AppContextProvider>
+    <Suspense fallback={<div>Loading...</div>}>
+      <AppContextProvider>{children}</AppContextProvider>
+    </Suspense>
   </body>
 </html>
   );
