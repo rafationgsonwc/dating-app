@@ -1,11 +1,7 @@
 "use client";
 
 export default function Navbar() {
-
-    const handleLogout = () => {
-        localStorage.removeItem("authUser");
-        window.location.href = "/";
-    }
+    
     return (
         <div className="side-navbar">
             <div className="side-navbar-content">
@@ -32,10 +28,6 @@ export default function Navbar() {
                 }}>
                     <i className="la la-user"></i>
                     <span>Profile</span>
-                </div>
-                <div className="side-navbar-item" onClick={handleLogout}>
-                    <i className="la la-sign-out"></i>
-                    <span>Logout</span>
                 </div>
             </div>
         </div>

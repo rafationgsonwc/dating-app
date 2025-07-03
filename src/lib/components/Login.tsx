@@ -1,5 +1,7 @@
 import { useRef, useState } from "react";
 import { signInWithGoogle, signInWithMobileNumber } from "../firebase/client";
+import OTPForm from "./OTPForm";
+import { validatePhoneNumber } from "../utils/utils";
 
 export default function Login(props: any) {
     const [phone, setPhone] = useState("");
@@ -10,12 +12,45 @@ export default function Login(props: any) {
     const confirmation = useRef<any>(null);
 
     const handleLogin = () => {
+        setLoading(true);
         signInWithMobileNumber(phone).then((result: any) => {
             confirmation.current = result;
             setDisplayOTP(true);
+            setLoading(false);
         }).catch((error: any) => {
             console.error(error);
+            setLoading(false);
         });
+    }
+
+    const handleOTPChange = (event: any) => {
+        const parsedValue = parseInt(event.target.value);
+        if (isNaN(parsedValue)) {
+            event.target.value = "";
+            return;
+        }
+
+        // Valid value proceed to next input
+        if (parsedValue) {
+            setOTP(otp + parsedValue.toString());
+            const nextInput = event.target.nextElementSibling;
+            if (nextInput) {
+                (nextInput as HTMLInputElement)?.focus();
+            }
+        }
+    }
+    
+    const handleOTPKeyUp = (event: any) => {
+        const target = event.target;
+        const key = event.key?.toLowerCase();
+        if (key === "backspace" || key === "delete") {
+            target.value = "";
+            setOTP(otp.slice(0, -1));
+            const previousInput = target.previousElementSibling;
+            if (previousInput) {
+                (previousInput as HTMLInputElement)?.focus();
+            }
+        }
     }
 
     return (
@@ -25,46 +60,32 @@ export default function Login(props: any) {
             <form>
                 <div className="form-group">
                     <label htmlFor="phone" style={{ color: "#fff" }}>Phone number</label>
-                    <input type="text" className="form-control" id="phone" placeholder="+63" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                    <input type="text" style={{ borderColor: phone.length && !validatePhoneNumber(phone) ? "red" : "" }} className="form-control" id="phone" placeholder="+63" value={phone} onChange={(e) => setPhone(e.target.value)} />
                 </div>
             </form>
-            {displayOTP && (
-            // Modal OTP form
-            <div className="modal-number-form">
-            <div className="modal-number-form-content">
-                <form>
-                    <div className="form-group">
-                        <label htmlFor="otp">OTP</label>
-                        <input type="text" className="form-control" id="otp" placeholder="Enter OTP" value={otp} onChange={(e) => setOTP(e.target.value)} />
-                    </div>
-                    <button className="btn btn-primary" type="button" style={{ width: "100%"}} onClick={() => {
-                        setLoading(true);
-                         confirmation.current.confirm(otp).then(async (result: any) => {
-                            // User credentials
-                            setLoading(false);
-                            setDisplayOTP(false);
-                            // Check if user exists
-                            const response = await fetch(`/api/get-user?userId=${result.user.uid}`, {
-                                method: "GET",
-                            })
-                            if (response.status === 404) {
-                                // User does not exist, show create account
-                                setDisplayCreateAccount(true);
-                                setLoading(false);
-                                return;
-                            }
-                            const data = await response.json();
-                            localStorage.setItem("authUser", JSON.stringify(data));
-                            window.location.href = "/explore";
-                        }).catch((error: any) => {
-                            console.error(error);
-                            setLoading(false);
-                        });
-                    }} disabled={loading}>{loading ? "Verifying OTP..." : "Verify"}</button>
-                </form>
-            </div>
-        </div>
-        )}
+            {displayOTP && <OTPForm otp={otp} handleOTPChange={handleOTPChange} handleOTPKeyUp={handleOTPKeyUp} loading={loading} onVerify={() => {
+                setLoading(true);
+                confirmation.current.confirm(otp).then(async (result: any) => {
+                   setLoading(false);
+                   setDisplayOTP(false);
+                   // Check if user exists
+                   const response = await fetch(`/api/get-user?userId=${result.user.uid}`, {
+                       method: "GET",
+                   })
+                   if (response.status === 404) {
+                       // User does not exist, show create account
+                       setDisplayCreateAccount(true);
+                       setLoading(false);
+                       return;
+                   }
+                   const data = await response.json();
+                   localStorage.setItem("authUser", JSON.stringify(data));
+                   window.location.href = "/explore";
+               }).catch((error: any) => {
+                   console.error(error);
+                   setLoading(false);
+               });
+            }} />}
         <div id="recaptcha-container" style={{ display: "none" }}></div>
         {displayCreateAccount && (
             <div className="modal-number-form">
@@ -78,7 +99,7 @@ export default function Login(props: any) {
             </div>
             </div>
         )}
-            <button className="btn btn-primary" type="button" style={{ width: "100%"}} onClick={handleLogin}>Login</button>
+            <button className="btn btn-primary" type="button" style={{ width: "100%"}} onClick={handleLogin} disabled={!validatePhoneNumber(phone) || loading}>{loading ? "Logging in..." : "Login"}</button>
             {/* Or login with Google */}
             <div className="or-divider">
                 <span>Or</span>

@@ -22,6 +22,11 @@ export default function Matches() {
     const [showDropdown, setShowDropdown] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
 
+    const handleLogout = () => {
+        localStorage.removeItem("authUser");
+        window.location.href = "/";
+    }
+
     const onSubmit = async () => {
         console.log(formData);
         setIsEditing(false);
@@ -116,6 +121,10 @@ export default function Matches() {
                                 setShowDropdown(false);
                                 setShowSettings(true);
                             }}>Settings</a>
+                            <a className="dropdown-item" href="#" style={{ color: "#ff3333" }} onClick={() => {
+                                setShowDropdown(false);
+                                handleLogout();
+                            }}>Logout</a>
                         </div>
                     </div>
                 ) : (

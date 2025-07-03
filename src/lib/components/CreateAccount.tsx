@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { signInWithGoogle, signInWithMobileNumber } from "../firebase/client";
 import { validatePhoneNumber } from "../utils/utils";
+import OTPForm from "./OTPForm";
 
 export default function CreateAccount(props: any) {
     const [profilePicture, setProfilePicture] = useState<File | null>(null);
@@ -84,50 +85,28 @@ export default function CreateAccount(props: any) {
         </div>)
         }
         <div id="recaptcha-container" style={{ display: "none" }}></div>
-        {displayOTP && (
-            // Modal OTP form
-            <div className="modal-number-form">
-            <div className="modal-number-form-content" style={{ height: "auto" }}>
-                <form className="digit-group">
-                    <div className="form-group">
-                        <label htmlFor="otp">OTP</label>
-                    </div>
-                     {/* Individual input for 6 digits */}
-                     <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", marginBottom: "20px" }}>
-                        <input type="text" id="digit-1" name="digit-1" data-next="digit-2" maxLength={1} inputMode="numeric" value={otp?.[0] || ""} onChange={(e) => handleOTPChange(e)} onKeyUp={(e) => handleOTPKeyUp(e)} />
-                        <input type="text" id="digit-2" name="digit-2" data-next="digit-3" data-previous="digit-1" maxLength={1} inputMode="numeric" value={otp?.[1] || ""} onChange={(e) => handleOTPChange(e)} onKeyUp={(e) => handleOTPKeyUp(e)} />
-                        <input type="text" id="digit-3" name="digit-3" data-next="digit-4" data-previous="digit-2" maxLength={1} inputMode="numeric" value={otp?.[2] || ""} onChange={(e) => handleOTPChange(e)} onKeyUp={(e) => handleOTPKeyUp(e)} />
-                        <input type="text" id="digit-4" name="digit-4" data-next="digit-5" data-previous="digit-3" maxLength={1} inputMode="numeric" value={otp?.[3] || ""} onChange={(e) => handleOTPChange(e)} onKeyUp={(e) => handleOTPKeyUp(e)} />
-                        <input type="text" id="digit-5" name="digit-5" data-next="digit-6" data-previous="digit-4" maxLength={1} inputMode="numeric" value={otp?.[4] || ""} onChange={(e) => handleOTPChange(e)} onKeyUp={(e) => handleOTPKeyUp(e)} />
-                        <input type="text" id="digit-6" name="digit-6" data-previous="digit-5" maxLength={1} inputMode="numeric" value={otp?.[5] || ""} onChange={(e) => handleOTPChange(e)} onKeyUp={(e) => handleOTPKeyUp(e)} />
-                    </div>
-                    
-                    <button className="btn btn-primary" type="button" style={{ width: "100%"}} onClick={() => {
-                        setLoading(true);
-                         confirmation.current.confirm(otp).then(async (result: any) => {
-                            setLoading(false);
-                            setUserCredentials(result);
-                            setDisplayOTP(false);
-                            // Check if user already exists
-                            const response = await fetch(`/api/get-user?userId=${result.user.uid}`, {
-                                method: "GET",
-                            })
-                            if (response.status === 404) {
-                                setDisplayCreateAccount(true);
-                                return;
-                            }
-                            const data = await response.json();
-                            localStorage.setItem("authUser", JSON.stringify(data));
-                            window.location.href = "/explore";
-                        }).catch((error: any) => {
-                            console.error(error);
-                            setLoading(false);
-                        });
-                    }} disabled={loading || otp.length < 6}>{loading ? "Verifying OTP..." : "Verify"}</button>
-                </form>
-            </div>
-        </div>
-        )}
+        {displayOTP && <OTPForm otp={otp} handleOTPChange={handleOTPChange} handleOTPKeyUp={handleOTPKeyUp} loading={loading} onVerify={() => {
+            setLoading(true);
+            confirmation.current.confirm(otp).then(async (result: any) => {
+               setLoading(false);
+               setUserCredentials(result);
+               setDisplayOTP(false);
+               // Check if user already exists
+               const response = await fetch(`/api/get-user?userId=${result.user.uid}`, {
+                   method: "GET",
+               })
+               if (response.status === 404) {
+                   setDisplayCreateAccount(true);
+                   return;
+               }
+               const data = await response.json();
+               localStorage.setItem("authUser", JSON.stringify(data));
+               window.location.href = "/explore";
+           }).catch((error: any) => {
+               console.error(error);
+               setLoading(false);
+           });
+        }} />}
         {
             displayCreateAccount && (
                 // Modal create account form
